@@ -40,8 +40,16 @@ export function exigirAlmacen() {
 
 const codificar = (p: string) => p.split("/").map(encodeURIComponent).join("/");
 
+/** Los archivos que empiezan por "r2/" están en Cloudflare R2 (variable R2_PUBLIC_URL); los demás en Supabase */
+export const enR2 = (p: string) => p.startsWith("r2/");
+
 /** Dirección pública de un archivo. Con `descarga`, el navegador lo descarga con ese nombre. */
 export function urlPublica(p: string, descarga?: string): string {
+  if (enR2(p)) {
+    // En R2 el original ya se guardó «para descargar» con su nombre, así que es la misma dirección
+    const r2 = process.env.R2_PUBLIC_URL?.trim().replace(/\/+$/, "");
+    return `${r2}/${codificar(p)}`;
+  }
   const base = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim().replace(/\/+$/, "");
   if (supa() && base) {
     const u = `${base}/storage/v1/object/public/${BUCKET}/${codificar(p)}`;
