@@ -1,0 +1,13 @@
+node_modules
+.next
+out
+# Datos y fotos de prueba en el PC (sin Supabase)
+.datos
+.env
+.env*.local
+*.tsbuildinfo
+next-env.d.ts
+.vercel
+
+# Fotos y capturas de prueba (no se suben a GitHub ni a Vercel)
+public/pruebas

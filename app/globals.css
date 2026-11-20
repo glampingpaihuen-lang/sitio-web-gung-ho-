@@ -1,0 +1,619 @@
+/* =====================================================================
+   Gung Ho · página de fotos
+   Negro y dorado, como el logo. El logo de Gung Ho es lo primero que se
+   ve; debajo, una tarjeta por empresa con su logo. Al entrar a una, las
+   fotos en tarjetas redondeadas, como en Moonlight.
+   Títulos en Cinzel (letras de inscripción, como las del logo); lo demás en Archivo.
+   ===================================================================== */
+
+:root {
+  --negro: #000000;
+  --tarjeta: #121212;
+  --oro: #eeb949;
+  --oro-claro: #f8d77c;
+  --linea-oro: rgb(238 185 73 / 0.3);
+  --marfil: #f6f1e7;
+  --marfil-suave: rgb(246 241 231 / 0.7);
+  --texto: "Archivo Variable", "Archivo", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --titulos: "Cinzel", "Trajan Pro", Georgia, serif;
+}
+
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  background: var(--negro);
+  color: var(--marfil);
+  font-family: var(--texto);
+  font-size: 1rem;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+img { max-width: 100%; }
+
+svg {
+  width: 20px;
+  height: 20px;
+  flex: none;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+button, input { font: inherit; color: inherit; }
+
+.sr {
+  position: absolute !important;
+  width: 1px; height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.enlace-oro { color: var(--oro); font-weight: 600; text-underline-offset: 3px; }
+.enlace-oro:focus-visible { outline: 2px solid var(--oro); outline-offset: 3px; border-radius: 4px; }
+
+/* ------------------------------ Fondo ------------------------------ */
+
+/* Dos capas: la imagen (::before) y un velo negro encima (::after) para que no compita con el contenido */
+.fondo {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  background: var(--negro);
+}
+.fondo::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: var(--fondo-img);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+.fondo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(120% 80% at 50% 0%, transparent 40%, rgb(0 0 0 / 0.55) 100%),
+    linear-gradient(rgb(0 0 0 / var(--oscuro)), rgb(0 0 0 / min(1, calc(var(--oscuro) + 0.15))));
+}
+.fondo--centrado::before { background-size: min(76vmin, 820px) auto; }
+
+/* Afiches de Gung Ho: desenfocados y apagados, solo como ambiente (vertical en el celular, horizontal en el computador) */
+.fondo--gungho::before {
+  inset: -48px;
+  background-image: url("/_next/image?url=%2Fgung_ho_vertical.png&w=828&q=75");
+  filter: blur(8px) saturate(0.7);
+  transform: scale(1.06);
+}
+@media (min-width: 720px) {
+  .fondo--gungho::before { background-image: url("/_next/image?url=%2Fgung_ho_horizontal.png&w=1920&q=75"); }
+}
+
+/* ----------------------------- Cabecera ----------------------------- */
+
+.cabecera {
+  display: grid;
+  grid-template-columns: 44px 1fr 44px;
+  align-items: center;
+  gap: 8px;
+  min-height: 76px;
+}
+.cabecera__logo {
+  justify-self: center;
+  display: block;
+  border-radius: 8px;
+}
+.cabecera__logo:focus-visible { outline: 2px solid var(--oro); outline-offset: 4px; }
+.cabecera__logo img {
+  display: block;
+  width: auto;
+  height: clamp(56px, 7vw, 72px);
+  filter: drop-shadow(0 2px 10px rgb(0 0 0 / 0.5));
+}
+/* El logo de Gung Ho viene en fondo negro: así el negro desaparece y queda solo el dorado */
+.cabecera__logo img.is-gungho { mix-blend-mode: screen; filter: none; }
+
+.cabecera--grande { grid-template-columns: 1fr; padding-top: clamp(8px, 3vw, 28px); }
+.cabecera--grande .cabecera__logo img {
+  width: min(64vw, 400px);
+  height: auto;
+}
+
+.volver {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border: 1px solid rgb(255 255 255 / 0.22);
+  border-radius: 50%;
+  background: rgb(255 255 255 / 0.05);
+  color: var(--marfil);
+}
+.volver:hover { background: rgb(255 255 255 / 0.12); }
+.volver:focus-visible { outline: 2px solid var(--oro); outline-offset: 2px; }
+
+/* ----------------------------- Portada ----------------------------- */
+
+.portada,
+.album {
+  max-width: 1120px;
+  min-height: 100dvh;
+  margin: 0 auto;
+  padding: max(8px, env(safe-area-inset-top)) clamp(14px, 4vw, 32px) 80px;
+}
+
+.portada__head,
+.album__head {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  margin: clamp(10px, 2.4vw, 22px) auto clamp(22px, 4vw, 36px);
+  max-width: 40rem;
+  text-align: center;
+}
+
+.titulo {
+  margin: 0;
+  font-family: var(--titulos);
+  font-size: clamp(1.6rem, 4.6vw, 2.6rem);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: 0.02em;
+  color: var(--marfil);
+  text-wrap: balance;
+  text-shadow: 0 2px 18px rgb(0 0 0 / 0.6);
+}
+.portada__sub,
+.album__sub {
+  margin: 0;
+  max-width: 42ch;
+  color: rgb(246 241 231 / 0.88);
+  text-shadow: 0 1px 12px rgb(0 0 0 / 0.95), 0 0 3px rgb(0 0 0 / 0.9);
+  font-size: clamp(0.9375rem, 1.5vw, 1.0625rem);
+}
+
+.portada__vacia,
+.portada__nada {
+  max-width: 34rem;
+  margin: 0 auto;
+  color: var(--marfil-suave);
+  text-align: center;
+}
+
+.buscar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: 440px;
+  height: 48px;
+  margin: 0 auto 24px;
+  padding: 0 18px;
+  border: 1px solid var(--linea-oro);
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.06);
+  color: var(--marfil-suave);
+}
+.buscar:focus-within { border-color: var(--oro); outline: 2px solid rgb(238 185 73 / 0.35); outline-offset: 2px; }
+.buscar input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: var(--marfil);
+  font-size: 1rem;
+}
+.buscar input::placeholder { color: rgb(246 241 231 / 0.5); }
+
+/* Tarjetas de las empresas: dos columnas en el celular, más en pantallas grandes.
+   Centradas, para que con pocas empresas no queden cargadas a un lado. */
+.tarjetas {
+  --cols: 2;
+  --sep: 14px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--sep);
+}
+.tarjetas > li { flex: 0 0 calc((100% - (var(--cols) - 1) * var(--sep)) / var(--cols)); }
+@media (min-width: 720px) { .tarjetas { --cols: 3; --sep: 20px; } }
+@media (min-width: 1000px) { .tarjetas { --cols: 4; --sep: 24px; } }
+
+.tarjeta {
+  position: relative;
+  display: block;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  border: 1px solid var(--linea-oro);
+  border-radius: 20px;
+  background: #fff;
+  color: var(--marfil);
+  text-decoration: none;
+  box-shadow: 0 14px 30px -16px rgb(0 0 0 / 0.9);
+  transition: border-color 0.2s ease, transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+  -webkit-tap-highlight-color: transparent;
+}
+.tarjeta:hover { border-color: var(--oro); transform: translateY(-3px); }
+.tarjeta:active { transform: scale(0.98); }
+.tarjeta:focus-visible { outline: 2px solid var(--oro); outline-offset: 3px; }
+
+/* El logo llena la tarjeta y deja libre la parte de abajo para el nombre */
+.tarjeta__logo {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 6% 9% 31%;
+}
+.tarjeta__logo img { width: 100%; height: 100%; object-fit: contain; }
+.tarjeta__logo b {
+  font-family: var(--titulos);
+  font-size: clamp(1.6rem, 6vw, 2.4rem);
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+/* Nombre encima de la imagen, en la parte de abajo (sin degradado: letra oscura sobre el blanco) */
+.tarjeta__pie {
+  position: absolute;
+  inset: auto 0 0;
+  display: grid;
+  justify-items: center;
+  gap: 2px;
+  padding: 0 12px 15px;
+  text-align: center;
+}
+/* Una rayita dorada encima del nombre */
+.tarjeta__pie::before {
+  content: "";
+  width: 26px;
+  height: 1.5px;
+  margin-bottom: 7px;
+  border-radius: 2px;
+  background: #c9a043;
+}
+/* Nombre en letras de inscripción (las mismas del título), espaciadas */
+.tarjeta__nombre {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  font-family: var(--titulos);
+  font-size: clamp(1rem, 1.6vw, 1.2rem);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: 0.09em;
+  color: #2a2115;
+}
+.tarjeta__total {
+  color: #9a7419;
+  font-size: 0.8125rem;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ------------------------------ Álbum ------------------------------ */
+
+.album__logo {
+  display: grid;
+  place-items: center;
+  width: 104px;
+  aspect-ratio: 1;
+  margin-bottom: 6px;
+  padding: 5px;
+  overflow: hidden;
+  border: 1px solid var(--linea-oro);
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 10px 26px -12px rgb(0 0 0 / 0.9);
+}
+.album__logo img { width: 100%; height: 100%; object-fit: contain; }
+.album__logo b { font-family: var(--titulos); color: #1a1a1a; }
+
+/* Fotos: dos columnas en el celular, tarjetas redondeadas como en Moonlight */
+.fotos {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+@media (min-width: 720px) { .fotos { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; } }
+@media (min-width: 1000px) { .fotos { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+
+.foto {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  border-radius: 20px;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+  background: rgb(255 255 255 / 0.06);
+  box-shadow: 0 12px 26px -14px rgb(0 0 0 / 0.9);
+}
+.foto button {
+  display: block;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: zoom-in;
+}
+.foto img,
+.foto video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+  -webkit-user-drag: none;
+  transition: transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.foto button { position: relative; touch-action: manipulation; }
+
+/* Ícono de video */
+.foto__play {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border: 1px solid rgb(255 255 255 / 0.5);
+  border-radius: 50%;
+  background: rgb(0 0 0 / 0.45);
+  color: #fff;
+  transform: translate(-50%, -50%);
+  backdrop-filter: blur(4px);
+}
+.foto__play svg { width: 22px; height: 22px; margin-left: 3px; }
+
+/* Elegir varias: círculo arriba a la derecha; la elegida se marca en dorado */
+.foto__marca {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  background: rgb(0 0 0 / 0.3);
+  color: #1a1a1a;
+  box-shadow: 0 1px 6px rgb(0 0 0 / 0.5);
+}
+.foto__marca svg { width: 18px; height: 18px; stroke-width: 2.6; }
+.foto.is-elegida .foto__marca { border-color: var(--oro); background: var(--oro); }
+.fotos.is-eligiendo .foto img,
+.fotos.is-eligiendo .foto video { transition: transform 0.2s ease; }
+.foto.is-elegida { box-shadow: 0 0 0 3px var(--oro), 0 12px 26px -14px rgb(0 0 0 / 0.9); }
+.foto.is-elegida img,
+.foto.is-elegida video { transform: scale(0.94); border-radius: 14px; }
+
+.galeria__acciones { display: flex; justify-content: flex-end; min-height: 40px; margin: -6px 0 12px; }
+.pildora {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 38px;
+  padding: 0 16px 0 12px;
+  border: 1px solid var(--linea-oro);
+  border-radius: 999px;
+  background: rgb(0 0 0 / 0.35);
+  color: var(--marfil);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  backdrop-filter: blur(6px);
+}
+.pildora:hover { border-color: var(--oro); }
+.pildora:focus-visible { outline: 2px solid var(--oro); outline-offset: 2px; }
+.pildora svg { width: 17px; height: 17px; color: var(--oro); }
+
+/* Barra de abajo mientras se eligen */
+.seleccion__espacio { height: 140px; }
+.seleccion {
+  position: fixed;
+  inset: auto 0 0;
+  z-index: 40;
+  display: grid;
+  gap: 10px;
+  padding: 12px max(14px, env(safe-area-inset-left)) max(14px, env(safe-area-inset-bottom));
+  border-top: 1px solid var(--linea-oro);
+  background: rgb(10 10 10 / 0.94);
+  backdrop-filter: blur(12px);
+  animation: sube 0.2s ease-out;
+}
+@keyframes sube { from { transform: translateY(100%); } }
+.seleccion > * { width: 100%; max-width: 560px; margin: 0 auto; }
+.seleccion__fila { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.seleccion__cuenta { font-size: 0.9375rem; font-weight: 650; }
+.seleccion__link {
+  min-height: 40px;
+  padding: 0 6px;
+  border: 0;
+  background: none;
+  color: var(--oro);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.seleccion__link:disabled { opacity: 0.4; }
+.seleccion__estado { display: grid; }
+
+.boton-oro {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 50px;
+  padding: 0 20px;
+  border: 0;
+  border-radius: 14px;
+  background: var(--oro);
+  color: #1a1407;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+.boton-oro:hover { background: var(--oro-claro); }
+.boton-oro:disabled { opacity: 0.45; cursor: default; }
+.boton-oro:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+.boton-oro svg { width: 20px; height: 20px; stroke-width: 2.2; }
+
+.descarga__texto {
+  display: block;
+  min-height: 50px;
+  padding: 14px 12px;
+  border: 0;
+  border-radius: 14px;
+  background: rgb(255 255 255 / 0.08);
+  color: var(--marfil);
+  font-size: 0.9375rem;
+  text-align: center;
+  cursor: default;
+}
+button.descarga__texto { cursor: pointer; width: 100%; }
+.descarga__texto.is-error { background: rgb(180 35 24 / 0.35); }
+
+.aviso {
+  position: fixed;
+  left: 50%;
+  bottom: max(18px, env(safe-area-inset-bottom));
+  z-index: 40;
+  width: min(92vw, 420px);
+  transform: translateX(-50%);
+  border: 1px solid var(--linea-oro);
+  border-radius: 14px;
+  background: rgb(10 10 10 / 0.94);
+  box-shadow: 0 16px 40px -16px rgb(0 0 0 / 0.9);
+}
+.aviso .descarga__texto { background: transparent; }
+.foto button:hover img { transform: scale(1.04); }
+.foto button:focus-visible { outline: 3px solid var(--oro); outline-offset: -3px; border-radius: 20px; }
+
+/* ------------------------------ Visor ------------------------------ */
+
+.visor {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  background: #000;
+  color: #fff;
+  animation: visor-entra 0.18s ease-out;
+}
+@keyframes visor-entra { from { opacity: 0; } }
+
+.visor__barra {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: max(10px, env(safe-area-inset-top)) clamp(10px, 2vw, 20px) 10px;
+}
+.visor__cuenta {
+  margin-right: auto;
+  padding-left: 6px;
+  color: var(--marfil-suave);
+  font-size: 0.9375rem;
+  font-variant-numeric: tabular-nums;
+}
+.visor__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 44px;
+  padding: 0 18px 0 14px;
+  border: 1px solid var(--linea-oro);
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.08);
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.9375rem;
+  text-decoration: none;
+  cursor: pointer;
+}
+.visor__btn:hover { background: rgb(255 255 255 / 0.16); }
+.visor__btn:focus-visible,
+.visor__flecha:focus-visible { outline: 2px solid var(--oro); outline-offset: 2px; }
+.visor__btn--solo { width: 44px; padding: 0; }
+.visor__btn--oro { border-color: var(--oro); background: var(--oro); color: #1a1407; }
+.visor__btn--oro:hover { background: var(--oro-claro); }
+.visor__btn:disabled { opacity: 0.7; cursor: default; }
+.visor__barra .visor__btn:not(.visor__btn--solo) { max-width: 64vw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.visor__video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: #000;
+}
+
+.visor__marco {
+  position: relative;
+  margin: 0 clamp(0px, 6vw, 88px) max(clamp(8px, 2vw, 24px), env(safe-area-inset-bottom));
+}
+.visor__mini,
+.visor__img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+.visor__img { opacity: 0; transition: opacity 0.25s ease; }
+.visor__img.is-lista { opacity: 1; }
+.visor__marco:has(.is-lista) .visor__mini { visibility: hidden; }
+
+.visor__flecha {
+  position: absolute;
+  top: 50%;
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  margin-top: 26px;
+  border: 0;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 0.12);
+  color: #fff;
+  cursor: pointer;
+  transform: translateY(-50%);
+}
+.visor__flecha:hover { background: rgb(255 255 255 / 0.22); }
+.visor__flecha svg { width: 26px; height: 26px; }
+.visor__flecha--ant { left: clamp(6px, 1.4vw, 18px); }
+.visor__flecha--sig { right: clamp(6px, 1.4vw, 18px); }
+@media (hover: none) {
+  .visor__flecha { width: 42px; height: 42px; background: rgb(0 0 0 / 0.4); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; animation: none !important; }
+}
