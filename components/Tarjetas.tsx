@@ -1,19 +1,35 @@
 "use client";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import type { EmpresaResumen } from "@/lib/tipos";
 import { cuentaArchivos, iniciales } from "./Logo";
 
 const sinTildes = (t: string) => t.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
 
+/**
+ * El logo llena todo el recuadro. Si es muy ancho o muy alto (por ejemplo un
+ * logo con letras a lo largo), se muestra completo para no cortarle el texto.
+ */
+function LogoTarjeta({ src }: { src: string }) {
+  const [entero, setEntero] = useState(false);
+  const revisar = useCallback((img: HTMLImageElement | null) => {
+    if (!img || !img.complete || !img.naturalWidth || !img.naturalHeight) return;
+    const r = img.naturalWidth / img.naturalHeight;
+    setEntero(r > 1.35 || r < 0.74);
+  }, []);
+  return (
+    <span className={entero ? "tarjeta__logo tarjeta__logo--entero" : "tarjeta__logo"}>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img ref={revisar} src={src} alt="" loading="lazy" onLoad={ev => revisar(ev.currentTarget)} />
+    </span>
+  );
+}
+
 /** Tarjeta de una empresa: su logo grande y el nombre. Al tocarla se ven sus fotos. */
 function Tarjeta({ e }: { e: EmpresaResumen }) {
   return (
     <Link href={`/${e.slug}`} className="tarjeta">
-      <span className="tarjeta__logo">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        {e.logo ? <img src={e.logo} alt="" loading="lazy" /> : <b>{iniciales(e.nombre)}</b>}
-      </span>
+      {e.logo ? <LogoTarjeta src={e.logo} /> : <span className="tarjeta__logo"><b>{iniciales(e.nombre)}</b></span>}
       <span className="tarjeta__pie">
         <span className="tarjeta__nombre">{e.nombre}</span>
         {e.total ? <span className="tarjeta__total">{cuentaArchivos(e.total, e.videos)}</span> : null}

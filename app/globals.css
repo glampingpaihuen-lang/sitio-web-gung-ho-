@@ -232,14 +232,18 @@ button, input { font: inherit; color: inherit; }
   justify-content: center;
   gap: var(--sep);
 }
-.tarjetas > li { flex: 0 0 calc((100% - (var(--cols) - 1) * var(--sep)) / var(--cols)); }
+.tarjetas > li {
+  display: flex;
+  flex: 0 0 calc((100% - (var(--cols) - 1) * var(--sep)) / var(--cols));
+}
 @media (min-width: 720px) { .tarjetas { --cols: 3; --sep: 20px; } }
 @media (min-width: 1000px) { .tarjetas { --cols: 4; --sep: 24px; } }
 
 .tarjeta {
   position: relative;
-  display: block;
-  aspect-ratio: 4 / 5;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
   overflow: hidden;
   border: 1px solid var(--linea-oro);
   border-radius: 20px;
@@ -254,15 +258,24 @@ button, input { font: inherit; color: inherit; }
 .tarjeta:active { transform: scale(0.98); }
 .tarjeta:focus-visible { outline: 2px solid var(--oro); outline-offset: 3px; }
 
-/* El logo llena la tarjeta y deja libre la parte de abajo para el nombre */
+/* El logo llena todo el recuadro de arriba, de borde a borde */
 .tarjeta__logo {
-  position: absolute;
-  inset: 0;
+  position: relative;
   display: grid;
   place-items: center;
-  padding: 6% 9% 31%;
+  aspect-ratio: 1;
+  overflow: hidden;
+  background: #fff;
 }
-.tarjeta__logo img { width: 100%; height: 100%; object-fit: contain; }
+.tarjeta__logo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+/* Logos muy anchos o muy altos: completos, para no cortarles las letras */
+.tarjeta__logo--entero { padding: 10%; }
+.tarjeta__logo--entero img { object-fit: contain; }
 .tarjeta__logo b {
   font-family: var(--titulos);
   font-size: clamp(1.6rem, 6vw, 2.4rem);
@@ -270,14 +283,14 @@ button, input { font: inherit; color: inherit; }
   color: #1a1a1a;
 }
 
-/* Nombre encima de la imagen, en la parte de abajo (sin degradado: letra oscura sobre el blanco) */
+/* Nombre debajo del logo, sobre el blanco de la tarjeta */
 .tarjeta__pie {
-  position: absolute;
-  inset: auto 0 0;
+  flex: 1;
   display: grid;
+  align-content: center;
   justify-items: center;
   gap: 2px;
-  padding: 0 12px 15px;
+  padding: 12px 12px 15px;
   text-align: center;
 }
 /* Una rayita dorada encima del nombre */
